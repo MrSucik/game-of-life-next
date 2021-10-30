@@ -30,11 +30,11 @@ const updateGame = async () => {
 export const manualUpdate = functions.https.onRequest((request, response) => {
   let count = 0;
   const interval = setInterval(() => {
-    if (count >= 60) {
+    if (count >= 59) {
       clearInterval(interval);
     }
+    functions.logger.log("Game updated");
     updateGame();
     count++;
   }, 1000);
-  response.send("Update initialized");
 });
