@@ -8,4 +8,16 @@ const app = firebase.apps.length
 
 const firestore = app.firestore();
 
-export { firestore };
+const currentGenerationKey = "generation/current";
+
+type GenerationDocument = {
+  data: string;
+};
+
+const getCurrentGeneration = async () => {
+  const doc = await firestore.doc(currentGenerationKey).get();
+  const { data } = doc.data() as GenerationDocument;
+  return JSON.parse(data) as boolean[][];
+};
+
+export { firestore, getCurrentGeneration };
