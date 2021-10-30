@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import { doc } from "./fire";
+import { doc, engineDoc } from "./fire";
 import Grid from "./game/grid";
 
 type GenerationDocument = {
@@ -20,14 +20,25 @@ const updateGame = async () => {
   doc.update({ data: JSON.stringify(nextData) });
 };
 
-export const manualUpdate = functions.https.onRequest((request, response) => {
-  let count = 0;
-  const interval = setInterval(() => {
-    if (count >= 59) {
-      clearInterval(interval);
-    }
-    functions.logger.log("Game updated");
-    updateGame();
-    count++;
-  }, 1000);
+export const scheduledUpdate = functions
+  .runWith({ timeoutSeconds: 60, memory: "4GB" })
+  .pubsub.schedule("every 1 mins")
+  .onRun(() => {
+    let count = 0;
+    const interval = setInterval(async () => {
+      if (count >= 59) {
+        clearInterval(interval);
+        return;
+      }
+      const { data } = await engineDoc.get();
+      if (data()?.running) {
+        functions.logger.log("Game updated");
+        await updateGame();
+        count++;
+      }
+    }, 1000);
+  });
+
+export const manualUpdate = functions.https.onRequest(() => {
+  engineDoc.update({ running: true });
 });

@@ -5,5 +5,6 @@ const app = initializeApp();
 const firestoreApp = app.firestore();
 
 const doc = firestoreApp.doc("generation/current");
+const engineDoc = firestoreApp.doc("engine/current");
 
-export { doc, firestoreApp };
+export { doc, engineDoc, firestoreApp };

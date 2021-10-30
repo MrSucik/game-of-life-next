@@ -18,7 +18,6 @@ const useWindowSize = (rows: number) => {
 const Board = () => {
   const gridRef = useRef(new Grid([[]]));
   const size = useWindowSize(gridRef.current.rowsCount);
-  const [iterationHash, setIterationHash] = useState(gridRef.current.iteration);
 
   const [value, loading, error] = useDocumentData(currentGenerationDoc as any, {
     transform: (val) => JSON.parse(val.data),
@@ -26,6 +25,10 @@ const Board = () => {
 
   useEffect(() => {
     initGameUpdate();
+    const interval = setInterval(() => {
+      initGameUpdate();
+    }, 59);
+    return clearInterval(interval);
   }, []);
 
   if (!loading && !error) {
