@@ -23,24 +23,28 @@ const updateGame = async () => {
 export const scheduledUpdate = functions
   .runWith({ timeoutSeconds: 60, memory: "4GB" })
   .pubsub.schedule("every 1 mins")
-  .onRun(() => {
-    let count = 0;
-    const interval = setInterval(async () => {
-      if (count >= 59) {
-        engineDoc.update({ running: false });
-        clearInterval(interval);
-        return;
-      }
-      const snapshot = await engineDoc.get();
-      if (snapshot.data()?.running) {
-        functions.logger.log("Game updated");
-        await updateGame();
-        count++;
-      } else {
-        functions.logger.log("Game paused");
-      }
-    }, 1000);
-  });
+  .onRun(
+    () =>
+      new Promise((resolve) => {
+        let count = 0;
+        const interval = setInterval(async () => {
+          if (count >= 59) {
+            engineDoc.update({ running: false });
+            clearInterval(interval);
+            resolve(null);
+            return;
+          }
+          const snapshot = await engineDoc.get();
+          if (snapshot.data()?.running) {
+            functions.logger.log("Game updated");
+            await updateGame();
+            count++;
+          } else {
+            functions.logger.log("Game paused");
+          }
+        }, 1000);
+      })
+  );
 
 export const manualUpdate = functions.https.onRequest(
   async (_request, response) => {
