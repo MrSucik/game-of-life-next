@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { getCurrentGeneration } from "../firebase/firestore";
+import { currentGenerationDoc } from "../firebase/firestore";
 import Grid from "../game/grid";
 import styles from "../styles/Board.module.css";
 import { getRandomColor } from "../utils/getRandomColor";
+import { useDocumentData } from "react-firebase-hooks/firestore";
 
 const useWindowSize = (rows: number) => {
   const [size, setSize] = useState(0);
@@ -13,32 +14,20 @@ const useWindowSize = (rows: number) => {
 };
 
 const Board = () => {
-  const interval = useRef(0);
   const gridRef = useRef(new Grid([[]]));
   const size = useWindowSize(gridRef.current.rowsCount);
   const [iterationHash, setIterationHash] = useState(gridRef.current.iteration);
 
-  const updateGrid = async () => {
-    const data = await getCurrentGeneration();
-    console.log(data);
-    gridRef.current = new Grid(data);
-    setIterationHash(Math.random());
-  };
+  const [value, loading, error] = useDocumentData(currentGenerationDoc as any, {
+    transform: (val) => JSON.parse(val.data),
+  });
 
-  useEffect(() => {
-    updateGrid();
-  }, []);
+  if (!loading && !error) {
+    gridRef.current = new Grid(value);
+  }
 
-  useEffect(() => {
-    clearInterval(interval.current);
-    interval.current = setInterval(() => {
-      gridRef.current.nextIteration();
-      setIterationHash(gridRef.current.iteration);
-    }, 1000) as unknown as number;
-
-    return () => clearInterval(interval.current);
-  }, [gridRef]);
   const cells = gridRef.current.grid.flat();
+
   return (
     <div
       className={styles.grid}
