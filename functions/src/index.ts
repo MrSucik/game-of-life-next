@@ -20,12 +20,21 @@ const updateGame = async () => {
   doc.update({ data: JSON.stringify(nextData) });
 };
 
-export const scheduledUpdate = functions.pubsub
-  .schedule("every 1 second")
-  .onRun(async () => {
-    await updateGame();
-  });
+// export const scheduledUpdate = functions
+//   .runWith({ timeoutSeconds: 60, memory: "4GB" })
+//   .pubsub.schedule("every 1 minute")
+//   .onRun(async () => {
+//     await updateGame();
+//   });
 
-export const manualUpdate = functions.https.onRequest(async () => {
-  await updateGame();
+export const manualUpdate = functions.https.onRequest((request, response) => {
+  let count = 0;
+  const interval = setInterval(() => {
+    if (count >= 60) {
+      clearInterval(interval);
+    }
+    updateGame();
+    count++;
+  }, 1000);
+  response.send("Update initialized");
 });
