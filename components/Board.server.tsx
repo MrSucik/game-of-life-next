@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { currentGenerationDoc } from "../firebase/firestore";
 import Grid from "../game/grid";
 import styles from "../styles/Board.module.css";
-import { getRandomColor } from "../utils/getRandomColor";
 import { useDocumentData } from "react-firebase-hooks/firestore";
+import { initGameUpdate } from "../firebase/functions";
+import Cell from "./Cell.client";
+import GameCell from "../game/cell";
 
 const useWindowSize = (rows: number) => {
   const [size, setSize] = useState(0);
@@ -22,12 +24,19 @@ const Board = () => {
     transform: (val) => JSON.parse(val.data),
   });
 
+  useEffect(() => {
+    initGameUpdate();
+  }, []);
+
   if (!loading && !error) {
     gridRef.current = new Grid(value);
   }
-
   const cells = gridRef.current.grid.flat();
-
+  const createCellClickHandler = (cell: GameCell) => () => {
+    cell.alive = !cell.alive;
+    const data = gridRef.current.exportAsDefinition();
+    currentGenerationDoc.update({ data: JSON.stringify(data) });
+  };
   return (
     <div
       className={styles.grid}
@@ -38,20 +47,12 @@ const Board = () => {
       }}
     >
       {cells.map((cell, index) => (
-        <div
+        <Cell
           key={index}
-          onClick={() => {
-            cell.alive = true;
-            setIterationHash(Math.random());
-          }}
-          className={styles.cell}
-          style={{
-            left: cell.x * size,
-            top: cell.y * size,
-            height: size,
-            background: cell.alive ? getRandomColor() : "transparent",
-          }}
-        ></div>
+          cell={cell}
+          size={size}
+          onClick={createCellClickHandler(cell)}
+        />
       ))}
     </div>
   );
