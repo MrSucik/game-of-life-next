@@ -21,14 +21,14 @@ const updateGame = async () => {
 };
 
 export const scheduledUpdate = functions
-  .runWith({ timeoutSeconds: 60, memory: "4GB" })
-  .pubsub.schedule("every 1 mins")
+  .runWith({ timeoutSeconds: 540, memory: "4GB" })
+  .pubsub.schedule("every 9 mins")
   .onRun(
     () =>
       new Promise((resolve) => {
         let count = 0;
         const interval = setInterval(async () => {
-          if (count >= 59) {
+          if (count >= 120 * 9) {
             clearInterval(interval);
             resolve(null);
             return;
@@ -41,7 +41,7 @@ export const scheduledUpdate = functions
           } else {
             functions.logger.log("Game paused");
           }
-        }, 1000);
+        }, 500);
       })
   );
 
