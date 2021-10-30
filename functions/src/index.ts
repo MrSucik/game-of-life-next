@@ -20,13 +20,6 @@ const updateGame = async () => {
   doc.update({ data: JSON.stringify(nextData) });
 };
 
-// export const scheduledUpdate = functions
-//   .runWith({ timeoutSeconds: 60, memory: "4GB" })
-//   .pubsub.schedule("every 1 minute")
-//   .onRun(async () => {
-//     await updateGame();
-//   });
-
 export const manualUpdate = functions.https.onRequest((request, response) => {
   let count = 0;
   const interval = setInterval(() => {
