@@ -1,0 +1,17 @@
+.container {
+  padding: 0 2rem;
+  display: grid;
+}
+
+.grid {
+  position: relative;
+  display: grid;
+  min-height: 100vh;
+  margin: auto;
+  border-inline: 1px dashed grey;
+}
+
+.cell {
+  position: absolute;
+  aspect-ratio: 1;
+}
