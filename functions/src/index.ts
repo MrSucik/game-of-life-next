@@ -27,18 +27,24 @@ export const scheduledUpdate = functions
     let count = 0;
     const interval = setInterval(async () => {
       if (count >= 59) {
+        engineDoc.update({ running: false });
         clearInterval(interval);
         return;
       }
-      const { data } = await engineDoc.get();
-      if (data()?.running) {
+      const snapshot = await engineDoc.get();
+      if (snapshot.data()?.running) {
         functions.logger.log("Game updated");
         await updateGame();
         count++;
+      } else {
+        functions.logger.log("Game paused");
       }
     }, 1000);
   });
 
-export const manualUpdate = functions.https.onRequest(() => {
-  engineDoc.update({ running: true });
-});
+export const manualUpdate = functions.https.onRequest(
+  async (_request, response) => {
+    await engineDoc.update({ running: true });
+    response.send();
+  }
+);
