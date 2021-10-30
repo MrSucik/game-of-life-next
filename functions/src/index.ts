@@ -29,7 +29,6 @@ export const scheduledUpdate = functions
         let count = 0;
         const interval = setInterval(async () => {
           if (count >= 59) {
-            engineDoc.update({ running: false });
             clearInterval(interval);
             resolve(null);
             return;
@@ -48,7 +47,6 @@ export const scheduledUpdate = functions
 
 export const manualUpdate = functions.https.onRequest(
   async (_request, response) => {
-    await engineDoc.update({ running: true });
     response.send();
   }
 );
