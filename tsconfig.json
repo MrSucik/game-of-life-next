@@ -25,7 +25,6 @@
     "**/*.tsx",
     "jest.config.js",
     "next.config.js",
-    "game-of-life-next-firebase-sdk.json"
   ],
   "exclude": [
     "node_modules"

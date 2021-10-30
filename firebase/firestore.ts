@@ -1,10 +1,4 @@
-import firebase from "firebase/compat/app";
-import firebaseConfig from "../game-of-life-next-firebase-sdk.json";
-import "firebase/compat/firestore";
-
-const app = firebase.apps.length
-  ? firebase.apps[0]
-  : firebase.initializeApp(firebaseConfig);
+import app from "./app";
 
 const firestore = app.firestore();
 
@@ -14,10 +8,12 @@ type GenerationDocument = {
   data: string;
 };
 
+type GenerationParsed = boolean[][];
+
 const getCurrentGeneration = async () => {
   const doc = await firestore.doc(currentGenerationKey).get();
   const { data } = doc.data() as GenerationDocument;
-  return JSON.parse(data) as boolean[][];
+  return JSON.parse(data) as GenerationParsed;
 };
 
 export { firestore, getCurrentGeneration };

@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { getCurrentGeneration } from "../firebase/firestore";
 import Grid from "../game/grid";
 import styles from "../styles/Board.module.css";
-import { firestore, getCurrentGeneration } from "../utils/fire";
-
-const getRandomColor = () => "#" + Math.random().toString(16).substr(-6);
+import { getRandomColor } from "../utils/getRandomColor";
 
 const useWindowSize = (rows: number) => {
   const [size, setSize] = useState(0);
