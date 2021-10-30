@@ -35,3 +35,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+game-of-life-next-firebase-adminsdk.json
+game-of-life-next-firebase-sdk.json

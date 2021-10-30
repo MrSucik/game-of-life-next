@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Grid from "../game/grid";
 import styles from "../styles/Board.module.css";
+import { firestore } from "../utils/fire";
 
 const initial = [
   [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
@@ -45,11 +46,16 @@ const Board = () => {
   const [iterationHash, setIterationHash] = useState(gridRef.current.iteration);
 
   useEffect(() => {
+    firestore
+      .doc("generation/current")
+      .get()
+      .then((data) => console.log(data.data()));
     clearInterval(interval.current);
     interval.current = setInterval(() => {
       gridRef.current.nextIteration();
       setIterationHash(gridRef.current.iteration);
     }, 1000) as unknown as number;
+
     return () => clearInterval(interval.current);
   }, [gridRef]);
   const cells = gridRef.current.grid.flat();
